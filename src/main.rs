@@ -1,4 +1,8 @@
-mod util;
+pub mod bits;
+#[allow(clippy::wildcard_imports)]
+use bits::*;
+
+pub mod util;
 #[allow(clippy::wildcard_imports)]
 use util::*;
 
@@ -17,7 +21,7 @@ fn main() {
 		"{:#x}",
 		// each bit represents a digit in radix `BASE`
 		successors(Some(BitVec::new(UN::one() << START_LEN)), |n| Some(
-			BitVec::new((**n).clone() + 1u8)
+			n.clone_inc()
 		))
 		/*
 		We must pay the price of conversion,

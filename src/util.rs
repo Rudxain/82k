@@ -1,66 +1,5 @@
-pub use core::{
-	iter::successors,
-	num::NonZeroU8 as Non0U8,
-	ops::{Deref, DerefMut},
-};
-
-pub use num_bigint::BigUint as UN;
-pub use num_integer::Integer;
-pub use num_traits::{One, Zero};
-
-#[derive(Debug, Clone)]
-pub struct BitIter {
-	i: u64,
-	n: UN,
-}
-impl BitIter {
-	pub const fn new(n: UN) -> Self {
-		Self { i: 0, n }
-	}
-}
-impl Iterator for BitIter {
-	type Item = bool;
-	fn next(&mut self) -> Option<Self::Item> {
-		// bounds-check
-		if self.i >= self.n.bits() {
-			return None;
-		}
-		let out = self.n.bit(self.i);
-		self.i = self
-			.i
-			.checked_add(1)
-			.unwrap_or_else(|| unreachable!("bounds-check failed"));
-		Some(out)
-	}
-}
-
-#[derive(Debug, Clone)]
-/// `Vec`tor of packed `bool`s,
-/// built on `BigUint`.
-pub struct BitVec(UN);
-impl BitVec {
-	pub const fn new(n: UN) -> Self {
-		Self(n)
-	}
-}
-impl Deref for BitVec {
-	type Target = UN;
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
-}
-impl DerefMut for BitVec {
-	fn deref_mut(&mut self) -> &mut Self::Target {
-		&mut self.0
-	}
-}
-impl IntoIterator for BitVec {
-	type Item = bool;
-	type IntoIter = BitIter;
-	fn into_iter(self) -> Self::IntoIter {
-		BitIter::new(self.0)
-	}
-}
+#[allow(clippy::wildcard_imports)]
+use crate::bits::*;
 
 const MIN_NON_TRIVIAL_BASE: Non0U8 = match Non0U8::new(3) {
 	Some(n) => n,
@@ -82,6 +21,7 @@ pub fn unpack_as_radix<T: IntoIterator<Item = bool>>(digits: T, radix: Non0U8) -
 
 /// Checks if `n` can be written in base `radix`,
 /// using only zeros and ones.
+#[must_use]
 pub fn is_0_1(n: UN, radix: Non0U8) -> bool {
 	let radix = UN::from(radix.get());
 	let n1 = UN::one();
@@ -104,6 +44,7 @@ pub fn is_0_1(n: UN, radix: Non0U8) -> bool {
 /// in all bases
 /// from the minimun non-trivial base (inclusive)
 /// to `max_radix` (exclusive).
+#[must_use]
 pub fn is_0_1_all(n: &UN, max_radix: Non0U8) -> bool {
 	// would `rev` be more optimal?
 	(MIN_NON_TRIVIAL_BASE.get()..max_radix.get()).all(|radix| {
