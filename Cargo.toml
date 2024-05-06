@@ -1,13 +1,15 @@
 [package]
 name = "n82k"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
-num-bigint = "0.4.4"
-num-integer = "0.1.46"
+num-traits = "0.2"
+num-integer = "0.1"
+num-bigint = "0.4"
 
 [lints.clippy]
+#cargo = "warn"
 pedantic = "warn"
 nursery = "warn"
 unwrap_used = "warn"

@@ -18,7 +18,7 @@ fn main() {
 	assert!(start > 1);
 
 	// each bit represents a digit in radix `BASE`
-	let mut packed_numeral = UN::from(start);
+	let mut packed_numeral = BitVec::new(UN::from(start));
 	loop {
 		/*
 		We must pay the price of conversion,
@@ -26,11 +26,11 @@ fn main() {
 		Maybe someone can come up with a clever algorithm
 		that exploits previously-unpacked values to infer the next?
 		*/
-		let n = unpack_as_radix(&packed_numeral, BASE);
+		let n = unpack_as_radix(packed_numeral.clone(), BASE);
 		// by definition, `BASE` is already checked,
 		// so no need to include it in the range
 		if is_0_1_all(&n, BASE) {
-			println!("{packed_numeral:#x}");
+			println!("{:#x}", *packed_numeral);
 			break;
 		}
 		// skip all `n` that match `!is_0_1(n, BASE)`
