@@ -1,0 +1,25 @@
+[package]
+name = "n82k"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+num-bigint = "0.4.4"
+num-integer = "0.1.46"
+
+[lints.clippy]
+pedantic = "warn"
+nursery = "warn"
+unwrap_used = "warn"
+float_arithmetic = "forbid"
+float_cmp = "forbid"
+large_include_file = "forbid"
+
+[lints.rust]
+unsafe_code = "deny"
+
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+panic = "abort"
