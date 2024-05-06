@@ -1,0 +1,45 @@
+# https://github.com/rust-lang/rust-clippy
+# https://rust-lang.github.io/rust-clippy/
+
+name: rust-clippy analyze
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  rust-clippy-analyze:
+    name: Run rust-clippy analyzing
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update toolchain
+        run: rustup update
+
+      - name: Install required crates
+        run: cargo install clippy-sarif sarif-fmt
+
+      - name: Run clippy
+        run: |
+          #!/bin/bash
+          set -euf
+          cargo clippy --all-features --message-format=json | \
+            clippy-sarif | \
+            tee rust-clippy-results.sarif | \
+            sarif-fmt
+          exit ${PIPESTATUS[0]}
+
+      - name: Upload analysis results to GH
+        # https://stackoverflow.com/a/58859404
+        if: success() || failure()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: rust-clippy-results.sarif
+          wait-for-processing: true
