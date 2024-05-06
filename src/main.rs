@@ -8,32 +8,27 @@ const BASE: Non0U8 = match Non0U8::new(6) {
 	_ => unreachable!(),
 };
 
-/// According to [Numberphile](https://youtu.be/LNS1fabDkeA)
 /// thousand-digit numerals have already been checked.
-const START: u128 = u128::MAX;
+/// source: `README.md` links.
+const START_LEN: u16 = 0x1000;
 
 fn main() {
-	let start = START;
-	// prevent us from using a trivial value
-	assert!(start > 1);
-
-	// each bit represents a digit in radix `BASE`
-	let mut packed_numeral = BitVec::new(UN::from(start));
-	loop {
+	println!(
+		"{:#x}",
+		// each bit represents a digit in radix `BASE`
+		successors(Some(BitVec::new(UN::one() << START_LEN)), |n| Some(
+			BitVec::new((**n).clone() + 1u8)
+		))
 		/*
 		We must pay the price of conversion,
 		regardless of representation.
 		Maybe someone can come up with a clever algorithm
 		that exploits previously-unpacked values to infer the next?
 		*/
-		let n = unpack_as_radix(packed_numeral.clone(), BASE);
+		.map(|packed| unpack_as_radix(packed, BASE))
 		// by definition, `BASE` is already checked,
 		// so no need to include it in the range
-		if is_0_1_all(&n, BASE) {
-			println!("{:#x}", *packed_numeral);
-			break;
-		}
-		// skip all `n` that match `!is_0_1(n, BASE)`
-		packed_numeral.inc();
-	}
+		.find(|n| is_0_1_all(n, BASE))
+		.unwrap_or_else(|| unreachable!())
+	);
 }

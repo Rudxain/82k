@@ -9,16 +9,16 @@ pub use num_integer::Integer;
 pub use num_traits::{One, Zero};
 
 #[derive(Debug, Clone)]
-pub struct BoolIter {
+pub struct BitIter {
 	i: u64,
 	n: UN,
 }
-impl BoolIter {
+impl BitIter {
 	pub const fn new(n: UN) -> Self {
 		Self { i: 0, n }
 	}
 }
-impl Iterator for BoolIter {
+impl Iterator for BitIter {
 	type Item = bool;
 	fn next(&mut self) -> Option<Self::Item> {
 		// bounds-check
@@ -35,6 +35,8 @@ impl Iterator for BoolIter {
 }
 
 #[derive(Debug, Clone)]
+/// `Vec`tor of packed `bool`s,
+/// built on `BigUint`.
 pub struct BitVec(UN);
 impl BitVec {
 	pub const fn new(n: UN) -> Self {
@@ -54,9 +56,9 @@ impl DerefMut for BitVec {
 }
 impl IntoIterator for BitVec {
 	type Item = bool;
-	type IntoIter = BoolIter;
+	type IntoIter = BitIter;
 	fn into_iter(self) -> Self::IntoIter {
-		BoolIter::new(self.0)
+		BitIter::new(self.0)
 	}
 }
 
